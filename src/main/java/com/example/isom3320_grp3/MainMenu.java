@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -39,7 +40,10 @@ public class MainMenu extends Application {
             Scene typeScene = createTypeScene(primaryStage, primaryScene);
             primaryStage.setScene(typeScene);
         });
-        btCreateTransaction.setOnAction(e -> {System.out.println("Create Transaction");});
+        btCreateTransaction.setOnAction(e -> {
+            Scene transactionScene = createTransactionScene(primaryStage, primaryScene);
+            primaryStage.setScene(transactionScene);
+        });
         btDisplayTransaction.setOnAction(e -> {System.out.println("Display Transaction");});
 
         //Add to VBox
@@ -57,8 +61,8 @@ public class MainMenu extends Application {
         primaryStage.setTitle("Create Account");
 
         BorderPane accountMenu = new BorderPane();
-        VBox buttonBox = new VBox(10);
-        buttonBox.setAlignment(Pos.CENTER);
+        VBox tfBox = new VBox(10);
+        tfBox.setAlignment(Pos.CENTER);
 
         //textfields
         HBox accountNameBox = new HBox(10);
@@ -79,9 +83,9 @@ public class MainMenu extends Application {
         tfInitialBalance.setPromptText("Initial Balance");
         initialBalanceBox.getChildren().addAll(lblInitialBalance, tfInitialBalance);
 
-        // Add textfield t0 account menu
-        buttonBox.getChildren().addAll(accountNameBox, currencyTypeBox, initialBalanceBox );
-        accountMenu.setCenter(buttonBox);
+        // Add textfield box t0 account menu
+        tfBox.getChildren().addAll(accountNameBox, currencyTypeBox, initialBalanceBox );
+        accountMenu.setCenter(tfBox);
 
         //Buttons
         Button btBackToMenu = new Button("Back");
@@ -113,7 +117,6 @@ public class MainMenu extends Application {
     }
 
     //method for create transactions type
-
     private Scene createTypeScene(Stage primaryStage , Scene menuScene) {
         primaryStage.setTitle("Create Transaction Type");
         BorderPane typeMenu = new BorderPane();
@@ -159,8 +162,81 @@ public class MainMenu extends Application {
 
         // Create and return new scene
         return new Scene(typeMenu , 300 , 200);
-
-
     }
 
+    //Create Transaction
+    private Scene createTransactionScene(Stage primaryStage , Scene menuScene) {
+        primaryStage.setTitle("Create Transaction Type");
+        BorderPane transactionMenu = new BorderPane();
+
+        //textfields
+        VBox transactionBox = new VBox(10);
+        transactionBox.setAlignment(Pos.CENTER);
+
+        HBox transactionIDBox = new HBox(10);
+        Label lblTransactionID = new Label("Transaction ID:");
+        TextField tfTransactionID = new TextField();
+        tfTransactionID.setPromptText("Transaction ID");
+        transactionIDBox.getChildren().addAll(lblTransactionID, tfTransactionID);
+
+        HBox dateBox = new HBox(10);
+        Label lblDate = new Label("Date:");
+        TextField tfDate = new TextField();
+        tfDate.setPromptText("Date");
+        dateBox.getChildren().addAll(lblDate, tfDate);
+
+        //ComboBox
+        HBox transactionAccountBox = new HBox(10);
+        Label lblTransactionAccount = new Label("Transaction Type:");
+        ComboBox<String> transactionAccountComboBox = new ComboBox<>();
+        transactionAccountComboBox.setPromptText("Transaction Account");
+        //transactionAccountComboBox.getItems()
+        transactionAccountBox.getChildren().addAll(lblTransactionAccount, transactionAccountComboBox);
+
+        HBox transactionTypeBox = new HBox(10);
+        Label lblTransactionType = new Label("Transaction Type:");
+        ComboBox<String> transactionTypeComboBox = new ComboBox<>();
+        transactionTypeComboBox.setPromptText("Transaction Type");
+        //transactionTypeComboBox.getItems()
+        transactionTypeBox.getChildren().addAll(lblTransactionType, transactionTypeComboBox);
+
+        //textfields
+        HBox transactionAmountBox = new HBox(10);
+        Label lblTransactionAmount = new Label("Transaction Amount:");
+        TextField tfTransactionAmount = new TextField();
+        tfTransactionAmount.setPromptText("Transaction Amount");
+        transactionAmountBox.getChildren().addAll(lblTransactionAmount, tfTransactionAmount);
+
+        HBox transactionRemarksBox = new HBox(10);
+        Label lblTransactionRemarks = new Label("Transaction Remarks:");
+        TextField tfTransactionRemarks = new TextField();
+        tfTransactionRemarks.setPromptText("Transaction Remarks");
+        transactionRemarksBox.getChildren().addAll(lblTransactionRemarks, tfTransactionRemarks);
+        HBox transactionDateBox = new HBox(10);
+
+        //add transaction box to transaction menu
+        transactionBox.getChildren().addAll(
+                transactionIDBox, dateBox , transactionAccountBox,
+                transactionTypeBox, transactionAmountBox, transactionRemarksBox);
+        transactionMenu.setCenter(transactionBox);
+
+        //Add buttons
+        Button btBackToMenu = new Button("Back");
+        Button btCreateAccount = new Button("Create Account");
+
+        btBackToMenu.setOnAction(e ->{
+            primaryStage.setTitle("Main Menu");
+            primaryStage.setScene(menuScene);
+        });
+        btCreateAccount.setOnAction(e -> {
+            System.out.println("Create Account");
+        });
+        HBox leftBox = new HBox(btBackToMenu);
+        HBox rightBox = new HBox(btCreateAccount);
+        HBox buttonBox = new HBox(leftBox, rightBox);
+        buttonBox.setSpacing(160);
+        transactionMenu.setBottom(buttonBox);
+
+        return new Scene(transactionMenu , 300 , 200);
+    }
 }
