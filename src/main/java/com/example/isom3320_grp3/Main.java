@@ -12,7 +12,7 @@ public class Main {
 
     private static Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) {
+    public static void assignment1Main() {
         while (true) {
             System.out.println("\nFinance Management System");
             System.out.println("1. Create Account");
