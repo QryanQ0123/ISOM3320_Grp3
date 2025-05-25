@@ -4,6 +4,8 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -33,7 +35,10 @@ public class MainMenu extends Application {
             Scene accountScene = createAccountScene(primaryStage, primaryScene);
             primaryStage.setScene(accountScene);
         });
-        btCreateType.setOnAction(e -> {System.out.println("Create Type");});
+        btCreateType.setOnAction(e -> {
+            Scene typeScene = createTypeScene(primaryStage, primaryScene);
+            primaryStage.setScene(typeScene);
+        });
         btCreateTransaction.setOnAction(e -> {System.out.println("Create Transaction");});
         btDisplayTransaction.setOnAction(e -> {System.out.println("Display Transaction");});
 
@@ -49,35 +54,58 @@ public class MainMenu extends Application {
 
     //method for createAccount
     private Scene createAccountScene(Stage primaryStage , Scene menuScene) {
+        primaryStage.setTitle("Create Account");
+
         BorderPane accountMenu = new BorderPane();
         VBox buttonBox = new VBox(10);
         buttonBox.setAlignment(Pos.CENTER);
 
-        Button btAccountName = new Button("Account Name");
-        Button btCurrencyType = new Button("Currency Type");
-        Button btInitialBalance = new Button("Initial Balance");
+        //textfields
+        HBox accountNameBox = new HBox(10);
+        Label lblAccountName = new Label("Account Name:");
+        TextField tfAccountName = new TextField();
+        tfAccountName.setPromptText("Account Name");
+        accountNameBox.getChildren().addAll(lblAccountName, tfAccountName);
+
+        HBox currencyTypeBox = new HBox(10);
+        Label lblCurrencyType = new Label("Currency Type:");
+        TextField tfCurrencyType = new TextField();
+        tfCurrencyType.setPromptText("Currency Type");
+        currencyTypeBox.getChildren().addAll(lblCurrencyType, tfCurrencyType);
+
+        HBox initialBalanceBox = new HBox(10);
+        Label lblInitialBalance = new Label("Initial Balance:");
+        TextField tfInitialBalance = new TextField();
+        tfInitialBalance.setPromptText("Initial Balance");
+        initialBalanceBox.getChildren().addAll(lblInitialBalance, tfInitialBalance);
+
+        // Add textfield t0 account menu
+        buttonBox.getChildren().addAll(accountNameBox, currencyTypeBox, initialBalanceBox );
+        accountMenu.setCenter(buttonBox);
+
+        //Buttons
         Button btBackToMenu = new Button("Back");
         Button btCreateAccount = new Button("Create Account");
 
         // Add actionevents
-        btAccountName.setOnAction(e -> System.out.println("Account Name"));
-        btCurrencyType.setOnAction(e -> System.out.println("Currency Type"));
-        btInitialBalance.setOnAction(e -> System.out.println("Initial Balance"));
+        btBackToMenu.setOnAction(e ->{
+                primaryStage.setTitle("Main Menu");
+                primaryStage.setScene(menuScene);
+                });
 
-        btBackToMenu.setOnAction(e ->
-                primaryStage.setScene(menuScene)
-                );
+        btCreateAccount.setOnAction(e -> {
+            //
+            //need stuff here
+            //
+            System.out.println("Create Account");});
 
-        btCreateAccount.setOnAction(e -> {System.out.println("Create Account");});
-
-        // Add buttons t0 account menu
-        buttonBox.getChildren().addAll(btAccountName, btCurrencyType, btInitialBalance);
-        accountMenu.setCenter(buttonBox);
-
-        HBox bottomBox = new HBox(160);
-        btBackToMenu.setAlignment(Pos.BOTTOM_LEFT);
-        btCreateAccount.setAlignment(Pos.BOTTOM_RIGHT);
-        bottomBox.getChildren().addAll(btBackToMenu, btCreateAccount);
+        //two hbox
+        HBox leftBox = new HBox(btBackToMenu);
+        HBox rightBox = new HBox(btCreateAccount);
+        leftBox.setAlignment(Pos.BASELINE_LEFT);
+        rightBox.setAlignment(Pos.BASELINE_RIGHT);
+        HBox bottomBox = new HBox(btBackToMenu, btCreateAccount);
+        bottomBox.setSpacing(160);
         accountMenu.setBottom(bottomBox);
 
         // Create and return new scene
@@ -85,12 +113,54 @@ public class MainMenu extends Application {
     }
 
     //method for create transactions type
-    /*
+
     private Scene createTypeScene(Stage primaryStage , Scene menuScene) {
+        primaryStage.setTitle("Create Transaction Type");
         BorderPane typeMenu = new BorderPane();
-        VBox buttonBox = new VBox(10);
-        buttonBox.setAlignment(Pos.CENTER);
+
+        //textfields
+        VBox tfBox = new VBox(10);
+        tfBox.setAlignment(Pos.CENTER);
+
+        HBox typeBox = new HBox(10);
+        Label lblType = new Label("Transaction Type:");
+        TextField tftype = new TextField();
+        tftype.setPromptText("Transaction Type");
+        typeBox.getChildren().addAll(lblType, tftype);
+
+        // Add tf t0 account menu
+        tfBox.getChildren().addAll(typeBox);
+        typeMenu.setCenter(tfBox);
+
+        //Buttons
+        Button btBackToMenu = new Button("Back");
+        Button btCreateAccount = new Button("Create Account");
+
+        // Add actionevents
+        btBackToMenu.setOnAction(e ->{
+            primaryStage.setTitle("Main Menu");
+            primaryStage.setScene(menuScene);
+        });
+
+        btCreateAccount.setOnAction(e -> {
+            //
+            //need stuff here
+            //
+            System.out.println("Create Account");});
+
+        //two hbox
+        HBox leftBox = new HBox(btBackToMenu);
+        HBox rightBox = new HBox(btCreateAccount);
+        leftBox.setAlignment(Pos.BASELINE_LEFT);
+        rightBox.setAlignment(Pos.BASELINE_RIGHT);
+        HBox bottomBox = new HBox(btBackToMenu, btCreateAccount);
+        bottomBox.setSpacing(160);
+        typeMenu.setBottom(bottomBox);
+
+        // Create and return new scene
+        return new Scene(typeMenu , 300 , 200);
+
 
     }
-     */
+
 }
