@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -17,7 +18,7 @@ public class MainMenu extends Application {
         vbox.setAlignment(Pos.CENTER);
 
         //Primary scene (Main Menu)
-        Scene primaryScene = new Scene(vbox);
+        Scene primaryScene = new Scene(vbox , 300 , 200);
         primaryStage.setScene(primaryScene);
 
         //buttons
@@ -56,21 +57,40 @@ public class MainMenu extends Application {
         Button btCurrencyType = new Button("Currency Type");
         Button btInitialBalance = new Button("Initial Balance");
         Button btBackToMenu = new Button("Back");
+        Button btCreateAccount = new Button("Create Account");
+
         // Add actionevents
         btAccountName.setOnAction(e -> System.out.println("Account Name"));
         btCurrencyType.setOnAction(e -> System.out.println("Currency Type"));
         btInitialBalance.setOnAction(e -> System.out.println("Initial Balance"));
+
         btBackToMenu.setOnAction(e ->
                 primaryStage.setScene(menuScene)
                 );
+
+        btCreateAccount.setOnAction(e -> {System.out.println("Create Account");});
+
         // Add buttons t0 account menu
         buttonBox.getChildren().addAll(btAccountName, btCurrencyType, btInitialBalance);
         accountMenu.setCenter(buttonBox);
-        accountMenu.setBottom(btBackToMenu);
-        BorderPane.setAlignment(btBackToMenu, Pos.BOTTOM_LEFT);
+
+        HBox bottomBox = new HBox(160);
+        btBackToMenu.setAlignment(Pos.BOTTOM_LEFT);
+        btCreateAccount.setAlignment(Pos.BOTTOM_RIGHT);
+        bottomBox.getChildren().addAll(btBackToMenu, btCreateAccount);
+        accountMenu.setBottom(bottomBox);
+
         // Create and return new scene
-        return new Scene(accountMenu);
+        return new Scene(accountMenu , 300 , 200);
     }
 
+    //method for create transactions type
+    /*
+    private Scene createTypeScene(Stage primaryStage , Scene menuScene) {
+        BorderPane typeMenu = new BorderPane();
+        VBox buttonBox = new VBox(10);
+        buttonBox.setAlignment(Pos.CENTER);
 
+    }
+     */
 }
