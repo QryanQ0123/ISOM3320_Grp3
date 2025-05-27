@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class Main {
     private static final ArrayList<Accounts> accountsList = new ArrayList<>(); // ArrayList to store accounts
     private static final ArrayList<Transactions> transactionsList = new ArrayList<>(); // ArrayList to store transactions
-    private static final ArrayList<String> transactionTypes = new ArrayList<>(); //ArrayList to store Transaction Types
+    private static ArrayList<String> transactionTypes = new ArrayList<>(); //ArrayList to store Transaction Types
 
     private static Scanner scanner = new Scanner(System.in);
 
