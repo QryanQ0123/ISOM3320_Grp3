@@ -278,9 +278,6 @@ public class MainMenu extends Application {
         //Amount
         HBox transactionAmountBox = new HBox(10);
         Label lblTransactionAmount = new Label("Transaction Amount:");
-
-        ComboBox<String> transactionCurrencyComboBox = new ComboBox<>();
-        transactionCurrencyComboBox.getItems().addAll("HKD", "USD", "EUR");
         TextField tfTransactionAmount = new TextField();
         tfTransactionAmount.setPromptText("Transaction Amount");
         transactionAmountBox.getChildren().addAll(lblTransactionAmount, lblTransactionCurrency, tfTransactionAmount);
@@ -310,7 +307,7 @@ public class MainMenu extends Application {
         });
         btCreateTransaction.setOnAction(e -> {
             try{
-            String transCurrency = transactionCurrencyComboBox.getValue();
+            String transCurrency = lblTransactionCurrency.getText();
             LocalDate transDate = LocalDate.parse(dateComboBox.getValue());
             String transType = transactionTypeComboBox.getValue();
             Accounts targetAcc = findAccountByID(transactionAccountComboBox.getValue());
@@ -319,9 +316,11 @@ public class MainMenu extends Application {
 
             if (transCurrency == null || transDate == null || transType == null || targetAcc == null){
                 showAlert(Alert.AlertType.ERROR, "Error", "Please Input all the fields.");
+                return;
             }
             if (amt < 0){
                 showAlert(Alert.AlertType.ERROR, "Error", "Please enter a non-negative number for initial balance.");
+                return;
             }
             Transactions newTransactions = new Transactions(transCurrency, transDate, transType, targetAcc, amt, rmk);
             transactionsList.add(newTransactions);
