@@ -1,6 +1,7 @@
 package com.example.isom3320_grp3;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class Transactions {
     private static int idCounter = 1; // Static ID generator for transactions
@@ -11,6 +12,8 @@ public class Transactions {
     private Accounts account; // Reference to an account
     private double amount;
     private String remarks;
+    private static ArrayList<String> transactionTypes = new ArrayList<>(); //ArrayList to store Transaction Types
+
 
     // Constructor for creating a transaction
     public Transactions(String transCurrencyType, LocalDate transactionDate, String transactionType, Accounts account, double amount, String remarks) {
@@ -22,7 +25,43 @@ public class Transactions {
         this.amount = amount;
         this.remarks = remarks;
     }
-    //Getters
+    // Add a new transaction type
+    public static boolean addTransactionType(String type) {
+        if (type == null || type.trim().isEmpty()) {
+            return false; // Invalid type
+        }
+        if (!transactionTypes.contains(type)) {
+            transactionTypes.add(type);
+            return true; // Successfully added
+        }
+        return false; // Type already exists
+    }
+
+    //Setters
+    public void setTransDate(LocalDate transdate){
+        transactionDate = transdate;
+    }
+
+    public void setTransType(String type){
+        transactionType = type;
+    }
+
+    public void setCurrency(String type){
+        transCurrencyType = type;
+    }
+
+    public void setAccount(Accounts acc){
+        account = acc;
+    }
+
+    public void setAmount(double amt){
+        amount = amt;
+    }
+
+    public void setRemarks(String rmk){
+        remarks = rmk;
+    }
+
     //Getters
     public int getTransID(){
         return transactionID;
@@ -47,6 +86,9 @@ public class Transactions {
     public String getRemarks(){
         return remarks;
     }
+
+    public static ArrayList<String> getTransactionTypes() {return transactionTypes; }
+
 
     // Display transaction details
     public void displayTransactionInfo() {
