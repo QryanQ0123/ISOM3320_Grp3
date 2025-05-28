@@ -1,7 +1,12 @@
 package com.example.isom3320_grp3;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -45,6 +50,8 @@ public class MainMenu extends Application {
         btCreateTransaction.setOnAction(e -> {
             if (accountsList.isEmpty() == true){
                 showAlert(Alert.AlertType.ERROR, "Error", "No Account Created.");
+            } else if (Transactions.getTransactionTypes().isEmpty()){
+                showAlert(Alert.AlertType.ERROR, "Error", "No Transaction Types Created.");
             } else {            
             Scene transactionScene = createTransactionScene(primaryStage, primaryScene);
             primaryStage.setScene(transactionScene);
@@ -227,51 +234,57 @@ public class MainMenu extends Application {
     private Scene createTransactionScene(Stage primaryStage , Scene menuScene) {
         primaryStage.setTitle("Create Transaction Type");
         BorderPane transactionMenu = new BorderPane();
-
-        //textfields
         VBox transactionBox = new VBox(10);
         transactionBox.setAlignment(Pos.CENTER);
 
+        //ID
         HBox transactionIDBox = new HBox(10);
         Label lblTransactionID = new Label("Transaction ID:");
-        TextField tfTransactionID = new TextField();
-        tfTransactionID.setPromptText("Transaction ID");
+        Label tfTransactionID = new Label(Integer.toString(Transactions.getIDCounter()));
         transactionIDBox.getChildren().addAll(lblTransactionID, tfTransactionID);
 
+        //Date
         HBox dateBox = new HBox(10);
         Label lblDate = new Label("Date:");
-        TextField tfDate = new TextField();
-        tfDate.setPromptText("Date");
-        dateBox.getChildren().addAll(lblDate, tfDate);
+        ComboBox<String> dateComboBox = new ComboBox<>();
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        for (int i = 0; i < 1461; i++) {
+            LocalDate date = today.minusDays(i);
+            dateComboBox.getItems().add(date.format(formatter));
+        }
+        dateBox.getChildren().addAll(lblDate, dateComboBox);
 
-        //ComboBox
+        //Account
         HBox transactionAccountBox = new HBox(10);
         Label lblTransactionAccount = new Label("Transaction Type:");
-        ComboBox<String> transactionAccountComboBox = new ComboBox<>();
-        transactionAccountComboBox.setPromptText("Transaction Account");
-        //transactionAccountComboBox.getItems()
+        ComboBox<Integer> transactionAccountComboBox = new ComboBox<>();
+        for (int i = 0; i < accountsList.size(); i++){
+            transactionAccountComboBox.getItems().add(accountsList.get(i).getAccountID());
+        }
         transactionAccountBox.getChildren().addAll(lblTransactionAccount, transactionAccountComboBox);
 
+        //Type
         HBox transactionTypeBox = new HBox(10);
         Label lblTransactionType = new Label("Transaction Type:");
-        ComboBox<String> transactionTypeComboBox = new ComboBox<>();
-        transactionTypeComboBox.setPromptText("Transaction Type");
-        //transactionTypeComboBox.getItems()
+        ComboBox<String> transactionTypeComboBox = new ComboBox<>(FXCollections.observableArrayList(Transactions.getTransactionTypes()));
         transactionTypeBox.getChildren().addAll(lblTransactionType, transactionTypeComboBox);
 
-        //textfields
+        //Amount
         HBox transactionAmountBox = new HBox(10);
         Label lblTransactionAmount = new Label("Transaction Amount:");
+        ComboBox<String> transactionCurrencyComboBox = new ComboBox<>();
+        transactionCurrencyComboBox.getItems().addAll("HKD", "USD", "EUR");
         TextField tfTransactionAmount = new TextField();
         tfTransactionAmount.setPromptText("Transaction Amount");
-        transactionAmountBox.getChildren().addAll(lblTransactionAmount, tfTransactionAmount);
+        transactionAmountBox.getChildren().addAll(lblTransactionAmount, transactionCurrencyComboBox, tfTransactionAmount);
 
+        //Remarks
         HBox transactionRemarksBox = new HBox(10);
         Label lblTransactionRemarks = new Label("Transaction Remarks:");
         TextField tfTransactionRemarks = new TextField();
-        tfTransactionRemarks.setPromptText("Transaction Remarks");
+        tfTransactionRemarks.setPromptText("Remarks");
         transactionRemarksBox.getChildren().addAll(lblTransactionRemarks, tfTransactionRemarks);
-        HBox transactionDateBox = new HBox(10);
 
         //add transaction box to transaction menu
         transactionBox.getChildren().addAll(
@@ -281,21 +294,65 @@ public class MainMenu extends Application {
 
         //Add buttons
         Button btBackToMenu = new Button("Back");
-        Button btCreateAccount = new Button("Create Account");
+        Button btCreateTransaction = new Button("Create Transaction");
+
+        //SetOnActions
 
         btBackToMenu.setOnAction(e ->{
             primaryStage.setTitle("Main Menu");
             primaryStage.setScene(menuScene);
         });
-        btCreateAccount.setOnAction(e -> {
-            System.out.println("Create Account");
+        btCreateTransaction.setOnAction(e -> {
+            try{
+            String transCurrency = transactionCurrencyComboBox.getValue();
+            LocalDate transDate = LocalDate.parse(dateComboBox.getValue());
+            String transType = transactionTypeComboBox.getValue();
+            Accounts targetAcc = findAccountByID(transactionAccountComboBox.getValue());
+            double amt = Double.parseDouble(tfTransactionAmount.getText());
+            String rmk = tfTransactionRemarks.getText();
+
+            if (transCurrency == null || transDate == null || transType == null || targetAcc == null){
+                showAlert(Alert.AlertType.ERROR, "Error", "Please Input all the fields.");
+            }
+            if (amt < 0){
+                showAlert(Alert.AlertType.ERROR, "Error", "Please enter a non-negative number for initial balance.");
+            }
+            Transactions newTransactions = new Transactions(transCurrency, transDate, transType, targetAcc, amt, rmk);
+            transactionsList.add(newTransactions);
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Transaction added. Transaction ID: " + newTransactions.getTransID());
+
+            transactionAccountComboBox.setValue(null);
+            dateComboBox.setValue(null);
+            transactionTypeComboBox.setValue(null);
+            transactionAccountComboBox.setValue(null);
+            tfTransactionAmount.clear();
+            tfTransactionRemarks.clear();
+
+            primaryStage.setTitle("Main Menu");
+            primaryStage.setScene(menuScene);
+
+        }catch (NumberFormatException ex) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Please enter a valid number for transaction balance.");
+            }
+
         });
+
+
         HBox leftBox = new HBox(btBackToMenu);
-        HBox rightBox = new HBox(btCreateAccount);
+        HBox rightBox = new HBox(btCreateTransaction);
         HBox buttonBox = new HBox(leftBox, rightBox);
         buttonBox.setSpacing(160);
         transactionMenu.setBottom(buttonBox);
 
         return new Scene(transactionMenu , 500 , 300);
+    }
+
+        private static Accounts findAccountByID(int accountID) {
+        for (Accounts account : accountsList) {
+            if (account.getAccountID() == accountID) {
+                return account;
+            }
+        }
+        return null;
     }
 }
