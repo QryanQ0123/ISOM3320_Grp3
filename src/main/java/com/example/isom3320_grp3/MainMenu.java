@@ -132,7 +132,8 @@ public class MainMenu extends Application {
                 primaryStage.setScene(menuScene);
             } catch (NumberFormatException ex) {
                 showAlert(Alert.AlertType.ERROR, "Input Error", "Please enter a valid number for initial balance.");
-            }});
+            }}
+        );
 
         //two hbox
         HBox leftBox = new HBox(btBackToMenu);
