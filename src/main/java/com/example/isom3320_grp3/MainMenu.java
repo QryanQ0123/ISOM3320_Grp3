@@ -257,12 +257,17 @@ public class MainMenu extends Application {
 
         //Account
         HBox transactionAccountBox = new HBox(10);
-        Label lblTransactionAccount = new Label("Transaction Type:");
+        Label lblTransactionAccount = new Label("Account ID");
         ComboBox<Integer> transactionAccountComboBox = new ComboBox<>();
+        Label lblTransactionCurrency = new Label(null);
         for (int i = 0; i < accountsList.size(); i++){
             transactionAccountComboBox.getItems().add(accountsList.get(i).getAccountID());
         }
         transactionAccountBox.getChildren().addAll(lblTransactionAccount, transactionAccountComboBox);
+        transactionAccountComboBox.setOnAction(e -> {
+            Accounts tempAcc = findAccountByID(transactionAccountComboBox.getValue());
+            lblTransactionCurrency.setText(tempAcc.getCurrencyType());
+        });
 
         //Type
         HBox transactionTypeBox = new HBox(10);
@@ -273,11 +278,12 @@ public class MainMenu extends Application {
         //Amount
         HBox transactionAmountBox = new HBox(10);
         Label lblTransactionAmount = new Label("Transaction Amount:");
+
         ComboBox<String> transactionCurrencyComboBox = new ComboBox<>();
         transactionCurrencyComboBox.getItems().addAll("HKD", "USD", "EUR");
         TextField tfTransactionAmount = new TextField();
         tfTransactionAmount.setPromptText("Transaction Amount");
-        transactionAmountBox.getChildren().addAll(lblTransactionAmount, transactionCurrencyComboBox, tfTransactionAmount);
+        transactionAmountBox.getChildren().addAll(lblTransactionAmount, lblTransactionCurrency, tfTransactionAmount);
 
         //Remarks
         HBox transactionRemarksBox = new HBox(10);
