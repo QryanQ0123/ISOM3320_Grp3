@@ -1,5 +1,6 @@
 package com.example.isom3320_grp3;
 
+import java.util.ArrayList;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,6 +11,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class MainMenu extends Application {
+    private static final ArrayList<Accounts> accountsList = new ArrayList<>(); // ArrayList to store accounts
+    private static final ArrayList<Transactions> transactionsList = new ArrayList<>(); // ArrayList to store transactions
+
     @Override
     public void start(Stage primaryStage){
         primaryStage.setTitle("Main Menu");
@@ -38,8 +42,12 @@ public class MainMenu extends Application {
             primaryStage.setScene(typeScene);
         });
         btCreateTransaction.setOnAction(e -> {
+            if (accountsList.isEmpty() == true){
+                showAlert(Alert.AlertType.ERROR, "Error", "No Account Created.");
+            } else {            
             Scene transactionScene = createTransactionScene(primaryStage, primaryScene);
             primaryStage.setScene(transactionScene);
+            }
         });
         btDisplayTransaction.setOnAction(e -> {System.out.println("Display Transaction");});
 
