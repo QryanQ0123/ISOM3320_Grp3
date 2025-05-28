@@ -10,10 +10,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 public class MainMenu extends Application {
     private static final ArrayList<Accounts> accountsList = new ArrayList<>(); // ArrayList to store accounts
-    private static final ArrayList<Transactions> transactionsList = new ArrayList<>(); // ArrayList to store transactions
-
+    private static final ArrayList<Transactions> transactionsList = new ArrayList<>(); // ArrayList to store transaction
     @Override
     public void start(Stage primaryStage){
         primaryStage.setTitle("Main Menu");
@@ -96,9 +97,9 @@ public class MainMenu extends Application {
 
         // Add actionevents
         btBackToMenu.setOnAction(e ->{
-                primaryStage.setTitle("Main Menu");
-                primaryStage.setScene(menuScene);
-                });
+            primaryStage.setTitle("Main Menu");
+            primaryStage.setScene(menuScene);
+        });
 
         btCreateAccount.setOnAction(e -> {
             try {
@@ -133,7 +134,6 @@ public class MainMenu extends Application {
             } catch (NumberFormatException ex) {
                 System.out.println("Please enter a valid number for initial balance.");
             }
-
             System.out.println("Create Account");});
 
         //two hbox
