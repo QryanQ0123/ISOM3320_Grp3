@@ -3,8 +3,6 @@ package com.example.isom3320_grp3;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
-
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
@@ -14,8 +12,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
-import java.util.ArrayList;
 
 public class MainMenu extends Application {
     private static final ArrayList<Accounts> accountsList = new ArrayList<>(); // ArrayList to store accounts
@@ -232,7 +228,7 @@ public class MainMenu extends Application {
         }
     //Create Transaction
     private Scene createTransactionScene(Stage primaryStage , Scene menuScene) {
-        primaryStage.setTitle("Create Transaction Type");
+        primaryStage.setTitle("Create Transaction");
         BorderPane transactionMenu = new BorderPane();
         VBox transactionBox = new VBox(10);
         transactionBox.setAlignment(Pos.CENTER);
