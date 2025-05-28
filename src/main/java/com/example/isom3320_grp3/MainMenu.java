@@ -322,6 +322,10 @@ public class MainMenu extends Application {
                 showAlert(Alert.AlertType.ERROR, "Error", "Please enter a non-negative number for initial balance.");
                 return;
             }
+            if (amt > targetAcc.getBalance()){
+                showAlert(Alert.AlertType.ERROR, "Error", "Insufficient Balance! Please enter another value.");
+                return;
+            }
             Transactions newTransactions = new Transactions(transCurrency, transDate, transType, targetAcc, amt, rmk);
             transactionsList.add(newTransactions);
             showAlert(Alert.AlertType.INFORMATION, "Success", "Transaction added. Transaction ID: " + newTransactions.getTransID());
