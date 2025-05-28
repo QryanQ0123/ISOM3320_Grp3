@@ -37,6 +37,31 @@ public class Transactions {
         return false; // Type already exists
     }
 
+    //Setters
+    public void setTransDate(LocalDate transdate){
+        transactionDate = transdate;
+    }
+
+    public void setTransType(String type){
+        transactionType = type;
+    }
+
+    public void setCurrency(String type){
+        transCurrencyType = type;
+    }
+
+    public void setAccount(Accounts acc){
+        account = acc;
+    }
+
+    public void setAmount(double amt){
+        amount = amt;
+    }
+
+    public void setRemarks(String rmk){
+        remarks = rmk;
+    }
+
     //Getters
     public int getTransID(){
         return transactionID;
