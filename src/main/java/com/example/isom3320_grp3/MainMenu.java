@@ -77,9 +77,10 @@ public class MainMenu extends Application {
 
         HBox currencyTypeBox = new HBox(10);
         Label lblCurrencyType = new Label("Currency Type:");
-        TextField tfCurrencyType = new TextField();
-        tfCurrencyType.setPromptText("Currency Type");
-        currencyTypeBox.getChildren().addAll(lblCurrencyType, tfCurrencyType);
+        ComboBox<String> currencyTypeComboBox = new ComboBox<>();
+        currencyTypeComboBox.setPromptText("Select Currency");
+        currencyTypeComboBox.getItems().addAll("HKD", "EUR", "USD");
+        currencyTypeBox.getChildren().addAll(lblCurrencyType, currencyTypeComboBox);
 
         HBox initialBalanceBox = new HBox(10);
         Label lblInitialBalance = new Label("Initial Balance:");
@@ -104,12 +105,12 @@ public class MainMenu extends Application {
         btCreateAccount.setOnAction(e -> {
             try {
                 String accountName = tfAccountName.getText().trim();
-                String currencyType = tfCurrencyType.getText().trim();
+                String currencyType = currencyTypeComboBox.getValue();
                 double initialBalance = Double.parseDouble(tfInitialBalance.getText().trim());
 
                 // Basic validation
-                if (accountName.isEmpty() || currencyType.isEmpty()) {
-                    showAlert(Alert.AlertType.ERROR, "Input Error", "Please fill in all fields.");
+                if (accountName.isEmpty() || currencyType == null) {
+                    showAlert(Alert.AlertType.ERROR, "Input Error", "Please fill in and select all fields.");
                     return;
                 }
                 if (initialBalance < 0) {
@@ -124,7 +125,7 @@ public class MainMenu extends Application {
 
                 // Clear fields
                 tfAccountName.clear();
-                tfCurrencyType.clear();
+                currencyTypeComboBox.setValue(null);
                 tfInitialBalance.clear();
 
                 // Return to main menu
