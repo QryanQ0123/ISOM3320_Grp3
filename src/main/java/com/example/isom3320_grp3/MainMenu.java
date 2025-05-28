@@ -101,9 +101,38 @@ public class MainMenu extends Application {
                 });
 
         btCreateAccount.setOnAction(e -> {
-            //
-            //need stuff here
-            //
+            try {
+                String accountName = tfAccountName.getText().trim();
+                String currencyType = tfCurrencyType.getText().trim();
+                double initialBalance = Double.parseDouble(tfInitialBalance.getText().trim());
+
+                // Basic validation
+                if (accountName.isEmpty() || currencyType.isEmpty()) {
+                    System.out.println("Please fill in all fields.");
+                    return;
+                }
+                if (initialBalance < 0) {
+                    System.out.println("Initial balance cannot be negative.");
+                    return;
+                }
+
+                // Create new account
+                Accounts newAccount = new Accounts(currencyType, initialBalance);
+                accountsList.add(newAccount);
+                System.out.println("Account created successfully:");
+                newAccount.displayAccountInfo();
+
+                // Clear fields
+                tfAccountName.clear();
+                tfCurrencyType.clear();
+                tfInitialBalance.clear();
+
+                // Return to main menu
+                primaryStage.setTitle("Main Menu");
+                primaryStage.setScene(menuScene);
+            } catch (NumberFormatException ex) {
+                System.out.println("Please enter a valid number for initial balance.");
+            }
             System.out.println("Create Account");});
 
         //two hbox
