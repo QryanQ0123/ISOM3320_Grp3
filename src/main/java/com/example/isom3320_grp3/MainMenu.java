@@ -131,9 +131,8 @@ public class MainMenu extends Application {
                 primaryStage.setTitle("Main Menu");
                 primaryStage.setScene(menuScene);
             } catch (NumberFormatException ex) {
-                System.out.println("Please enter a valid number for initial balance.");
-            }
-            System.out.println("Create Account");});
+                showAlert(Alert.AlertType.ERROR, "Input Error", "Please enter a valid number for initial balance.");
+            }});
 
         //two hbox
         HBox leftBox = new HBox(btBackToMenu);
