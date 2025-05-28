@@ -133,6 +133,7 @@ public class MainMenu extends Application {
             } catch (NumberFormatException ex) {
                 System.out.println("Please enter a valid number for initial balance.");
             }
+
             System.out.println("Create Account");});
 
         //two hbox
