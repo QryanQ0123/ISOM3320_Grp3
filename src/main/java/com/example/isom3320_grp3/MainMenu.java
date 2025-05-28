@@ -109,19 +109,18 @@ public class MainMenu extends Application {
 
                 // Basic validation
                 if (accountName.isEmpty() || currencyType.isEmpty()) {
-                    System.out.println("Please fill in all fields.");
+                    showAlert(Alert.AlertType.ERROR, "Input Error", "Please fill in all fields.");
                     return;
                 }
                 if (initialBalance < 0) {
-                    System.out.println("Initial balance cannot be negative.");
+                    showAlert(Alert.AlertType.ERROR, "Input Error", "Initial balance cannot be negative.");
                     return;
                 }
 
                 // Create new account
                 Accounts newAccount = new Accounts(currencyType, initialBalance);
                 accountsList.add(newAccount);
-                System.out.println("Account created successfully:");
-                newAccount.displayAccountInfo();
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Account created successfully: ID " + newAccount.getAccountID());
 
                 // Clear fields
                 tfAccountName.clear();
