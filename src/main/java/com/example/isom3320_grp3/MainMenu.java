@@ -266,7 +266,7 @@ public class MainMenu extends Application {
         for (int i = 0; i < accountsList.size(); i++){
             transactionAccountComboBox.getItems().add(accountsList.get(i).getAccountID());
         }
-        transactionAccountBox.getChildren().addAll(lblTransactionAccount, transactionAccountComboBox, lblAccountName);
+        transactionAccountBox.getChildren().addAll(lblTransactionAccount, transactionAccountComboBox, lblAccountName, lblAccountBal);
         transactionAccountComboBox.setOnAction(e -> {
             Accounts tempAcc = findAccountByID(transactionAccountComboBox.getValue());
             lblTransactionCurrency.setText(tempAcc.getCurrencyType());
@@ -278,7 +278,7 @@ public class MainMenu extends Application {
         HBox transactionTypeBox = new HBox(10);
         Label lblTransactionType = new Label("Transaction Type:");
         ComboBox<String> transactionTypeComboBox = new ComboBox<>(FXCollections.observableArrayList(Transactions.getTransactionTypes()));
-        transactionTypeBox.getChildren().addAll(lblTransactionType, lblAccountBal, transactionTypeComboBox);
+        transactionTypeBox.getChildren().addAll(lblTransactionType, transactionTypeComboBox);
 
         //Amount
         HBox transactionAmountBox = new HBox(10);
