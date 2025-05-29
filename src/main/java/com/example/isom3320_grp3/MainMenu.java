@@ -263,7 +263,7 @@ public class MainMenu extends Application {
         Label lblTransactionAccount = new Label("Account ID");
         ComboBox<Integer> transactionAccountComboBox = new ComboBox<>();
         Label lblTransactionCurrency = new Label(null);
-
+        Label lblAccountBal = new Label(null);
         Label lblAccountName = new Label(null);
         for (int i = 0; i < accountsList.size(); i++){
             transactionAccountComboBox.getItems().add(accountsList.get(i).getAccountID());
@@ -273,14 +273,14 @@ public class MainMenu extends Application {
             Accounts tempAcc = findAccountByID(transactionAccountComboBox.getValue());
             lblTransactionCurrency.setText(tempAcc.getCurrencyType());
             lblAccountName.setText(tempAcc.getAccountName());
-
+            lblAccountBal.setText("Remaining Balance: " + Double.toString(tempAcc.getBalance()));
         });
 
         //Type
         HBox transactionTypeBox = new HBox(10);
         Label lblTransactionType = new Label("Transaction Type:");
         ComboBox<String> transactionTypeComboBox = new ComboBox<>(FXCollections.observableArrayList(Transactions.getTransactionTypes()));
-        transactionTypeBox.getChildren().addAll(lblTransactionType, transactionTypeComboBox);
+        transactionTypeBox.getChildren().addAll(lblTransactionType, lblAccountBal, transactionTypeComboBox);
 
         //Amount
         HBox transactionAmountBox = new HBox(10);
