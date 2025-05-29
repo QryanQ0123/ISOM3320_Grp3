@@ -412,11 +412,18 @@ public class MainMenu extends Application {
             primaryStage.setScene(menuScene);
         });
 
+        Button btShowChart = new Button("showChart");
+        btShowChart.setOnAction(e -> {
+            primaryStage.setTitle("ShowChart");
+            primaryStage.setScene(chartScene);
+        });
+
         // Layout the table and button
+        HBox chartBottomBox = new HBox(btBackToMenu, btShowChart);
         root.setCenter(tableView);
-        root.setBottom(btBackToMenu);
-        BorderPane.setAlignment(btBackToMenu, Pos.CENTER);
-        BorderPane.setMargin(btBackToMenu, new javafx.geometry.Insets(10));
+        root.setBottom(chartBottomBox);
+        BorderPane.setAlignment(chartBottomBox, Pos.CENTER);
+        BorderPane.setMargin(chartBottomBox, new javafx.geometry.Insets(10));
 
         // Create and return the scene
         return new Scene(root, 500, 300);
@@ -440,5 +447,19 @@ public class MainMenu extends Application {
         }
         return null;
     }
+    private Scene chartScene(Stage primaryStage , Scene displayTransactionScene) {
+        primaryStage.setTitle("Display Chart");
+        // Root layout for the scene
+        BorderPane chartMainPane = new BorderPane();
+        // Show Chart
+
+        //Back button to list
+        Button btBackToMenu = new Button("Back");
+        btBackToMenu.setOnAction(e -> {
+            primaryStage.setTitle("Transaction List");
+            primaryStage.setScene(displayTransactionScene);
+        });
+        return new Scene(chartMainPane, 500, 300);
+    };
 
 }
