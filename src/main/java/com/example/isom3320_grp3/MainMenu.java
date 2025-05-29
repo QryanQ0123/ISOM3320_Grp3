@@ -122,9 +122,9 @@ public class MainMenu extends Application {
                 }
 
                 // Create new account
-                Accounts newAccount = new Accounts(currencyType, initialBalance);
+                Accounts newAccount = new Accounts(accountName,currencyType, initialBalance);
                 accountsList.add(newAccount);
-                showAlert(Alert.AlertType.INFORMATION, "Success", "Account created successfully: ID " + newAccount.getAccountID());
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Account created successfully: ID " + newAccount.getAccountID() +", Name: " + newAccount.getAccountName());
 
                 // Clear fields
                 tfAccountName.clear();

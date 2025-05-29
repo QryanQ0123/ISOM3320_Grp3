@@ -3,12 +3,14 @@ package com.example.isom3320_grp3;
 public class Accounts {
     private static int idCounter = 1; // counter
     private int accountID;
+    private String accountName;
     private String currencyType;
     private double balance;
 
     // Constructor for creating accounts
-    public Accounts(String currencyType, double balance) {
+    public Accounts(String accountName, String currencyType, double balance) {
         this.accountID = idCounter++; // Auto-generate unique account ID
+        this.accountName = accountName;
         this.currencyType = currencyType;
         this.balance = balance;
     }
@@ -17,6 +19,10 @@ public class Accounts {
     public int getAccountID() {
 
         return accountID;
+    }
+
+    public String getAccountName() {
+        return accountName;
     }
 
     public String getCurrencyType() {
