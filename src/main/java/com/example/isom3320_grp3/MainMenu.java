@@ -256,13 +256,15 @@ public class MainMenu extends Application {
         Label lblTransactionAccount = new Label("Account ID");
         ComboBox<Integer> transactionAccountComboBox = new ComboBox<>();
         Label lblTransactionCurrency = new Label(null);
+        Label lblAccountName = new Label(null);
         for (int i = 0; i < accountsList.size(); i++){
             transactionAccountComboBox.getItems().add(accountsList.get(i).getAccountID());
         }
-        transactionAccountBox.getChildren().addAll(lblTransactionAccount, transactionAccountComboBox);
+        transactionAccountBox.getChildren().addAll(lblTransactionAccount, transactionAccountComboBox, lblAccountName);
         transactionAccountComboBox.setOnAction(e -> {
             Accounts tempAcc = findAccountByID(transactionAccountComboBox.getValue());
             lblTransactionCurrency.setText(tempAcc.getCurrencyType());
+            lblAccountName.setText(tempAcc.getAccountName());
         });
 
         //Type
@@ -323,6 +325,7 @@ public class MainMenu extends Application {
                 return;
             }
             Transactions newTransactions = new Transactions(transCurrency, transDate, transType, targetAcc, amt, rmk);
+            targetAcc.deductFromBalance(amt);
             transactionsList.add(newTransactions);
             showAlert(Alert.AlertType.INFORMATION, "Success", "Transaction added. Transaction ID: " + newTransactions.getTransID());
 
