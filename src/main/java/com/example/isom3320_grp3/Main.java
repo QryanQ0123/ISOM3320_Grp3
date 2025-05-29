@@ -73,7 +73,7 @@ public class Main {
             balance = 0;
         }
 
-        Accounts account = new Accounts(currencyType, balance);
+        Accounts account = new Accounts("Name", currencyType, balance);
         accountsList.add(account); // Add the new account to the ArrayList
 
         System.out.println("Account created successfully!");

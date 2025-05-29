@@ -70,8 +70,9 @@ public class Transactions {
     public static int getIdCounter(){
         return idCounter;
     }
-    
+
     public int getTransactionID(){
+
         return transactionID;
     }
 
