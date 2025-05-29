@@ -3,11 +3,17 @@ package com.example.isom3320_grp3;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+
 import javafx.application.Application;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -44,7 +50,7 @@ public class MainMenu extends Application {
             primaryStage.setScene(typeScene);
         });
         btCreateTransaction.setOnAction(e -> {
-            if (accountsList.isEmpty() == true){
+            if (accountsList.isEmpty()){
                 showAlert(Alert.AlertType.ERROR, "Error", "No Account Created.");
             } else if (Transactions.getTransactionTypes().isEmpty()){
                 showAlert(Alert.AlertType.ERROR, "Error", "No Transaction Types Created.");
@@ -53,7 +59,15 @@ public class MainMenu extends Application {
             primaryStage.setScene(transactionScene);
             }
         });
-        btDisplayTransaction.setOnAction(e -> {System.out.println("Display Transaction");});
+        btDisplayTransaction.setOnAction(e -> {
+                    if (transactionsList.isEmpty()) {
+                        showAlert(Alert.AlertType.ERROR, "Error", "No Transaction Found.");
+                    } else {
+                        Scene dpTransactionScene = displayTransactionScene(primaryStage, primaryScene);
+                        primaryStage.setScene(dpTransactionScene);
+                    }
+                });
+
 
         //Add to VBox
         vbox.getChildren().addAll(btCreateAccount, btCreateType, btCreateTransaction, btDisplayTransaction);
@@ -236,7 +250,7 @@ public class MainMenu extends Application {
         //ID
         HBox transactionIDBox = new HBox(10);
         Label lblTransactionID = new Label("Transaction ID:");
-        Label tfTransactionID = new Label(Integer.toString(Transactions.getIDCounter()));
+        Label tfTransactionID = new Label(Integer.toString(Transactions.getIdCounter()));
         transactionIDBox.getChildren().addAll(lblTransactionID, tfTransactionID);
 
         //Date
@@ -324,7 +338,7 @@ public class MainMenu extends Application {
             }
             Transactions newTransactions = new Transactions(transCurrency, transDate, transType, targetAcc, amt, rmk);
             transactionsList.add(newTransactions);
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Transaction added. Transaction ID: " + newTransactions.getTransID());
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Transaction added. Transaction ID: " + newTransactions.getTransactionID());
 
             transactionAccountComboBox.setValue(null);
             dateComboBox.setValue(null);
@@ -359,5 +373,60 @@ public class MainMenu extends Application {
             }
         }
         return null;
+    }
+    private Scene displayTransactionScene(Stage primaryStage, Scene menuScene) {
+        primaryStage.setTitle("Display Transactions");
+
+        // Root layout for the scene
+        BorderPane root = new BorderPane();
+
+        // TableView for displaying transactions
+        TableView<Transactions> tableView = new TableView<>();
+
+        // Define columns for the table
+        TableColumn<Transactions, Integer> colID = new TableColumn<>("Transaction ID");
+        colID.setCellValueFactory(new PropertyValueFactory<>("transactionID"));
+
+        TableColumn<Transactions, String> colCurrency = new TableColumn<>("Currency");
+        colCurrency.setCellValueFactory(new PropertyValueFactory<>("transCurrencyType"));
+
+        TableColumn<Transactions, LocalDate> colDate = new TableColumn<>("Date");
+        colDate.setCellValueFactory(new PropertyValueFactory<>("transactionDate"));
+
+        TableColumn<Transactions, String> colType = new TableColumn<>("Type");
+        colType.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
+
+        TableColumn<Transactions, Integer> colAccount = new TableColumn<>("Account ID");
+        colAccount.setCellValueFactory(data ->
+                new SimpleIntegerProperty(data.getValue().getAccount().getAccountID()).asObject()
+        );
+
+        TableColumn<Transactions, Double> colAmount = new TableColumn<>("Amount");
+        colAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+
+        TableColumn<Transactions, String> colRemarks = new TableColumn<>("Remarks");
+        colRemarks.setCellValueFactory(new PropertyValueFactory<>("remarks"));
+
+        // Add columns to the table
+        tableView.getColumns().addAll(colID, colCurrency, colDate, colType, colAccount, colAmount, colRemarks);
+
+        // Populate the table with data
+        tableView.getItems().addAll(Transactions.getTransactionList());
+
+        // Button to go back to the main menu
+        Button btBackToMenu = new Button("Back");
+        btBackToMenu.setOnAction(e -> {
+            primaryStage.setTitle("Main Menu");
+            primaryStage.setScene(menuScene);
+        });
+
+        // Layout the table and button
+        root.setCenter(tableView);
+        root.setBottom(btBackToMenu);
+        BorderPane.setAlignment(btBackToMenu, Pos.CENTER);
+        BorderPane.setMargin(btBackToMenu, new javafx.geometry.Insets(10));
+
+        // Create and return the scene
+        return new Scene(root, 800, 600);
     }
 }

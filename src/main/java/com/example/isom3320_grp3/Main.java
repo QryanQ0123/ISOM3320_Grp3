@@ -273,7 +273,7 @@ public class Main {
     public static void sortDate() {
         for (int i = 0; i < transactionsList.size() - 1; i++) {
             for (int j = 0; j < transactionsList.size() - i - 1; j++) {
-                if (transactionsList.get(j).getTransDate().isAfter(transactionsList.get(j + 1).getTransDate())) {
+                if (transactionsList.get(j).getTransactionDate().isAfter(transactionsList.get(j + 1).getTransactionDate())) {
                     // Swap adjacent transactions if they are in the wrong order
                     Transactions temp = transactionsList.get(j);
                     transactionsList.set(j, transactionsList.get(j + 1));
@@ -290,7 +290,7 @@ public class Main {
         for (int i = 0; i < transactionsList.size() - 1; i++) {
             for (int j = 0; j < transactionsList.size() - i - 1; j++) {
                 // Use compareToIgnoreCase for case-insensitive comparison
-                if (transactionsList.get(j).getTransType().compareToIgnoreCase(transactionsList.get(j + 1).getTransType()) > 0) {
+                if (transactionsList.get(j).getTransactionType().compareToIgnoreCase(transactionsList.get(j + 1).getTransactionType()) > 0) {
                     // Swap transactions if the current type is greater than the next
                     Transactions temp = transactionsList.get(j);
                     transactionsList.set(j, transactionsList.get(j + 1));
@@ -306,7 +306,7 @@ public class Main {
     public static void sortAcc() {
         for (int i = 0; i < transactionsList.size() - 1; i++) {
             for (int j = 0; j < transactionsList.size() - i - 1; j++) {
-                if (transactionsList.get(j).getTransAccounts().getAccountID() > transactionsList.get(j + 1).getTransAccounts().getAccountID()) {
+                if (transactionsList.get(j).getAccount().getAccountID() > transactionsList.get(j + 1).getAccount().getAccountID()) {
                     // Swap if the current account ID is greater than the next
                     Transactions temp = transactionsList.get(j);
                     transactionsList.set(j, transactionsList.get(j + 1));
