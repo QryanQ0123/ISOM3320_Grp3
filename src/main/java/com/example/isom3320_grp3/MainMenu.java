@@ -481,55 +481,43 @@ public class MainMenu extends Application {
                 pieChartData.add(new PieChart.Data(type + ": " + String.format("%.2f", amount), amount))
         );
         pieChart.setData(pieChartData);
-
-        // Create Bar Chart for weekly spending
+        // Create Bar Chart for proportion of spending by account
         CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Week");
-        yAxis.setLabel("Spending Amount");
+        NumberAxis yAxis = new NumberAxis(0, 100, 10);
+        xAxis.setLabel("Account");
+        yAxis.setLabel("Proportion of Total Spending (%)");
 
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
-        barChart.setTitle("Weekly Spending");
+        barChart.setTitle("Spending Proportion by Account");
 
-        // Find date range
-        LocalDate minDate = transactionsList.stream()
-                .map(Transactions::getTransactionDate)
-                .min(LocalDate::compareTo)
-                .orElse(LocalDate.now());
-        LocalDate maxDate = transactionsList.stream()
-                .map(Transactions::getTransactionDate)
-                .max(LocalDate::compareTo)
-                .orElse(LocalDate.now());
-
-        // Group transactions by week
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Spending");
-
-        long totalDays = ChronoUnit.DAYS.between(minDate, maxDate) + 1;
-        int weeks = (int) Math.ceil(totalDays / 7.0);
-
-        for (int i = 0; i < weeks; i++) {
-            LocalDate weekStart = minDate.plusDays(i * 7);
-            LocalDate weekEnd = weekStart.plusDays(6);
-            double weeklyTotal = transactionsList.stream()
-                    .filter(t -> !t.getTransactionDate().isBefore(weekStart) && !t.getTransactionDate().isAfter(weekEnd))
-                    .mapToDouble(Transactions::getAmount)
-                    .sum();
-            String weekLabel = weekStart + " to " + (weekEnd.isAfter(maxDate) ? maxDate : weekEnd);
-            series.getData().add(new XYChart.Data<>(weekLabel, weeklyTotal));
+        // Aggregate spending by account
+        Map<Accounts, Double> accountSpending = new HashMap<>();
+        double totalSpending = 0.0;
+        for (Transactions transaction : transactionsList) {
+            Accounts account = transaction.getAccount();
+            double amount = transaction.getAmount();
+            accountSpending.merge(account, amount, Double::sum);
+            totalSpending += amount;
         }
+        // Create bar chart data
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Proportion");
+        final double finalTotalSpending = totalSpending > 0 ? totalSpending : 1.0; // Avoid division by zero
+        accountSpending.forEach((account, amount) -> {
+            double proportion = (amount / finalTotalSpending) * 100;
+            String label = "ID: " + account.getAccountID() + " (" + account.getAccountName() + ")";
+            series.getData().add(new XYChart.Data<>(label, proportion));
+        });
 
         barChart.getData().add(series);
 
-        // Layout charts
         VBox chartsBox = new VBox(20, pieChart, barChart);
         chartsBox.setAlignment(Pos.CENTER);
         root.setCenter(chartsBox);
 
-        // Back button
         Button btBackToMenu = new Button("Back");
         btBackToMenu.setOnAction(e -> {
-            primaryStage.setTitle("Display Transactions");
+            primaryStage.setTitle("Transaction Display");
             primaryStage.setScene(displayTransactionScene(primaryStage, displayTransactionScene));
         });
 
@@ -545,9 +533,7 @@ public class MainMenu extends Application {
     private static Accounts findAccountByID(Integer accountID) {
         if (accountID == null) return null;
         for (Accounts account : accountsList) {
-            if (account.getAccountID() == accountID) {
-                return account;
-            }
+            if (account.getAccountID() == accountID) return account;
         }
         return null;
     }
