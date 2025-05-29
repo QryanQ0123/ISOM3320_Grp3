@@ -254,13 +254,17 @@ public class MainMenu extends Application {
         Label lblTransactionAccount = new Label("Account ID");
         ComboBox<Integer> transactionAccountComboBox = new ComboBox<>();
         Label lblTransactionCurrency = new Label(null);
+
+        Label lblAccountName = new Label(null);
         for (int i = 0; i < accountsList.size(); i++){
             transactionAccountComboBox.getItems().add(accountsList.get(i).getAccountID());
         }
-        transactionAccountBox.getChildren().addAll(lblTransactionAccount, transactionAccountComboBox);
+        transactionAccountBox.getChildren().addAll(lblTransactionAccount, transactionAccountComboBox, lblAccountName);
         transactionAccountComboBox.setOnAction(e -> {
             Accounts tempAcc = findAccountByID(transactionAccountComboBox.getValue());
             lblTransactionCurrency.setText(tempAcc.getCurrencyType());
+            lblAccountName.setText(tempAcc.getAccountName());
+
         });
 
         //Type
@@ -301,40 +305,43 @@ public class MainMenu extends Application {
         });
         btCreateTransaction.setOnAction(e -> {
             try{
-                String transCurrency = lblTransactionCurrency.getText();
-                LocalDate transDate = LocalDate.parse(dateComboBox.getValue());
-                String transType = transactionTypeComboBox.getValue();
-                Accounts targetAcc = findAccountByID(transactionAccountComboBox.getValue());
-                double amt = Double.parseDouble(tfTransactionAmount.getText());
-                String rmk = tfTransactionRemarks.getText();
 
-                if (transCurrency == null || transDate == null || transType == null || targetAcc == null){
-                    showAlert(Alert.AlertType.ERROR, "Error", "Please Input all the fields.");
-                    return;
-                }
-                if (amt < 0){
-                    showAlert(Alert.AlertType.ERROR, "Error", "Please enter a non-negative number for initial balance.");
-                    return;
-                }
-                if (amt > targetAcc.getBalance()){
-                    showAlert(Alert.AlertType.ERROR, "Error", "Insufficient Balance! Please enter another value.");
-                    return;
-                }
-                Transactions newTransactions = new Transactions(transCurrency, transDate, transType, targetAcc, amt, rmk);
-                transactionsList.add(newTransactions);
-                showAlert(Alert.AlertType.INFORMATION, "Success", "Transaction added. Transaction ID: " + newTransactions.getTransID());
+            String transCurrency = lblTransactionCurrency.getText();
+            LocalDate transDate = LocalDate.parse(dateComboBox.getValue());
+            String transType = transactionTypeComboBox.getValue();
+            Accounts targetAcc = findAccountByID(transactionAccountComboBox.getValue());
+            double amt = Double.parseDouble(tfTransactionAmount.getText());
+            String rmk = tfTransactionRemarks.getText();
 
-                transactionAccountComboBox.setValue(null);
-                dateComboBox.setValue(null);
-                transactionTypeComboBox.setValue(null);
-                transactionAccountComboBox.setValue(null);
-                tfTransactionAmount.clear();
-                tfTransactionRemarks.clear();
+            if (transCurrency == null || transDate == null || transType == null || targetAcc == null){
+                showAlert(Alert.AlertType.ERROR, "Error", "Please Input all the fields.");
+                return;
+            }
+            if (amt < 0){
+                showAlert(Alert.AlertType.ERROR, "Error", "Please enter a non-negative number for initial balance.");
+                return;
+            }
+            if (amt > targetAcc.getBalance()){
+                showAlert(Alert.AlertType.ERROR, "Error", "Insufficient Balance! Please enter another value.");
+                return;
+            }
+            Transactions newTransactions = new Transactions(transCurrency, transDate, transType, targetAcc, amt, rmk);
+            targetAcc.deductFromBalance(amt);
+            transactionsList.add(newTransactions);
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Transaction added. Transaction ID: " + newTransactions.getTransID());
 
-                primaryStage.setTitle("Main Menu");
-                primaryStage.setScene(menuScene);
+            transactionAccountComboBox.setValue(null);
+            dateComboBox.setValue(null);
+            transactionTypeComboBox.setValue(null);
+            transactionAccountComboBox.setValue(null);
+            tfTransactionAmount.clear();
+            tfTransactionRemarks.clear();
 
-            }catch (NumberFormatException ex) {
+            primaryStage.setTitle("Main Menu");
+            primaryStage.setScene(menuScene);
+
+        }catch (NumberFormatException ex) {
+
                 showAlert(Alert.AlertType.ERROR, "Error", "Please enter a valid number for transaction balance.");
             }
 
@@ -349,6 +356,7 @@ public class MainMenu extends Application {
 
         return new Scene(transactionMenu , 500 , 300);
     }
+
 
     //Display Transaction
     private Scene createDisplayScene(Stage primaryStage , Scene menuScene) {
@@ -441,6 +449,7 @@ public class MainMenu extends Application {
     }
 
     private static Accounts findAccountByID(int accountID) {
+
         for (Accounts account : accountsList) {
             if (account.getAccountID() == accountID) {
                 return account;
