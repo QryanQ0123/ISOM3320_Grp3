@@ -463,46 +463,58 @@ public class MainMenu extends Application {
 
         BorderPane root = new BorderPane();
 
-        // Create Pie Chart for spending by transaction type
-        PieChart pieChart = new PieChart();
-        pieChart.setTitle("Spending by Transaction Type");
+        // Define exchange rates to USD
+        Map<String, Double> exchangeRates = new HashMap<>();
+        exchangeRates.put("HKD", 0.128);
+        exchangeRates.put("EUR", 1.09);
+        exchangeRates.put("USD", 1.0);
 
-        // Aggregate spending by transaction type
+        // Create Pie Chart for spending by transaction type (in USD)
+        PieChart pieChart = new PieChart();
+        pieChart.setTitle("Spending by Transaction Type (USD)");
+
+        // Aggregate spending by transaction type in USD
         Map<String, Double> typeSpending = new HashMap<>();
         for (Transactions transaction : transactionsList) {
             String type = transaction.getTransactionType();
             double amount = transaction.getAmount();
-            typeSpending.merge(type, amount, Double::sum);
+            String currency = transaction.getTransCurrencyType();
+            double amountInUSD = amount * exchangeRates.getOrDefault(currency, 1.0);
+            typeSpending.merge(type, amountInUSD, Double::sum);
         }
 
         // Populate Pie Chart
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
         typeSpending.forEach((type, amount) ->
-                pieChartData.add(new PieChart.Data(type + ": " + String.format("%.2f", amount), amount))
+                pieChartData.add(new PieChart.Data(type + ": " + String.format("%.2f USD", amount), amount))
         );
         pieChart.setData(pieChartData);
-        // Create Bar Chart for proportion of spending by account
+
+        // Create Bar Chart for proportion of spending by account (in USD)
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis(0, 100, 10);
         xAxis.setLabel("Account");
         yAxis.setLabel("Proportion of Total Spending (%)");
 
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
-        barChart.setTitle("Spending Proportion by Account");
+        barChart.setTitle("Spending Proportion by Account (USD)");
 
-        // Aggregate spending by account
+        // Aggregate spending by account in USD
         Map<Accounts, Double> accountSpending = new HashMap<>();
-        double totalSpending = 0.0;
+        double totalSpendingUSD = 0.0;
         for (Transactions transaction : transactionsList) {
             Accounts account = transaction.getAccount();
             double amount = transaction.getAmount();
-            accountSpending.merge(account, amount, Double::sum);
-            totalSpending += amount;
+            String currency = transaction.getTransCurrencyType();
+            double amountInUSD = amount * exchangeRates.getOrDefault(currency, 1.0);
+            accountSpending.merge(account, amountInUSD, Double::sum);
+            totalSpendingUSD += amountInUSD;
         }
+
         // Create bar chart data
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Proportion");
-        final double finalTotalSpending = totalSpending > 0 ? totalSpending : 1.0; // Avoid division by zero
+        final double finalTotalSpending = totalSpendingUSD > 0 ? totalSpendingUSD : 1.0; // Avoid division by zero
         accountSpending.forEach((account, amount) -> {
             double proportion = (amount / finalTotalSpending) * 100;
             String label = "ID: " + account.getAccountID() + " (" + account.getAccountName() + ")";
@@ -517,7 +529,7 @@ public class MainMenu extends Application {
 
         Button btBackToMenu = new Button("Back");
         btBackToMenu.setOnAction(e -> {
-            primaryStage.setTitle("Transaction Display");
+            primaryStage.setTitle("Display Transactions");
             primaryStage.setScene(displayTransactionScene(primaryStage, displayTransactionScene));
         });
 
@@ -528,7 +540,6 @@ public class MainMenu extends Application {
 
         return new Scene(root, 800, 600);
     }
-
 
     private static Accounts findAccountByID(Integer accountID) {
         if (accountID == null) return null;
