@@ -18,6 +18,16 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import java.time.temporal.ChronoUnit; // For ChronoUnit
+import java.util.HashMap; // For HashMap
+import java.util.Map; // For Map interface
+import javafx.collections.FXCollections; // For FXCollections
+import javafx.collections.ObservableList; // For ObservableList
 
 public class MainMenu extends Application {
     private static final ArrayList<Accounts> accountsList = new ArrayList<>(); // ArrayList to store accounts
@@ -60,13 +70,13 @@ public class MainMenu extends Application {
             }
         });
         btDisplayTransaction.setOnAction(e -> {
-                    if (transactionsList.isEmpty()) {
-                        showAlert(Alert.AlertType.ERROR, "Error", "No Transaction Found.");
-                    } else {
-                        Scene dpTransactionScene = displayTransactionScene(primaryStage, primaryScene);
-                        primaryStage.setScene(dpTransactionScene);
-                    }
-                });
+            if (transactionsList.isEmpty()) {
+                showAlert(Alert.AlertType.ERROR, "Error", "No Transaction Found.");
+            } else {
+                Scene dpTransactionScene = displayTransactionScene(primaryStage, primaryScene);
+                primaryStage.setScene(dpTransactionScene);
+            }
+        });
 
         //Add to VBox
         vbox.getChildren().addAll(btCreateAccount, btCreateType, btCreateTransaction, btDisplayTransaction);
@@ -313,41 +323,41 @@ public class MainMenu extends Application {
         btCreateTransaction.setOnAction(e -> {
             try{
 
-            String transCurrency = lblTransactionCurrency.getText();
-            LocalDate transDate = LocalDate.parse(dateComboBox.getValue());
-            String transType = transactionTypeComboBox.getValue();
-            Accounts targetAcc = findAccountByID(transactionAccountComboBox.getValue());
-            double amt = Double.parseDouble(tfTransactionAmount.getText());
-            String rmk = tfTransactionRemarks.getText();
+                String transCurrency = lblTransactionCurrency.getText();
+                LocalDate transDate = LocalDate.parse(dateComboBox.getValue());
+                String transType = transactionTypeComboBox.getValue();
+                Accounts targetAcc = findAccountByID(transactionAccountComboBox.getValue());
+                double amt = Double.parseDouble(tfTransactionAmount.getText());
+                String rmk = tfTransactionRemarks.getText();
 
-            if (transCurrency == null || transDate == null || transType == null || targetAcc == null){
-                showAlert(Alert.AlertType.ERROR, "Error", "Please Input all the fields.");
-                return;
-            }
-            if (amt < 0){
-                showAlert(Alert.AlertType.ERROR, "Error", "Please enter a non-negative number for initial balance.");
-                return;
-            }
-            if (amt > targetAcc.getBalance()){
-                showAlert(Alert.AlertType.ERROR, "Error", "Insufficient Balance! Please enter another value.");
-                return;
-            }
-            Transactions newTransactions = new Transactions(transCurrency, transDate, transType, targetAcc, amt, rmk);
-            targetAcc.deductFromBalance(amt);
-            transactionsList.add(newTransactions);
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Transaction added. Transaction ID: " + newTransactions.getTransactionID());
+                if (transCurrency == null || transDate == null || transType == null || targetAcc == null){
+                    showAlert(Alert.AlertType.ERROR, "Error", "Please Input all the fields.");
+                    return;
+                }
+                if (amt < 0){
+                    showAlert(Alert.AlertType.ERROR, "Error", "Please enter a non-negative number for initial balance.");
+                    return;
+                }
+                if (amt > targetAcc.getBalance()){
+                    showAlert(Alert.AlertType.ERROR, "Error", "Insufficient Balance! Please enter another value.");
+                    return;
+                }
+                Transactions newTransactions = new Transactions(transCurrency, transDate, transType, targetAcc, amt, rmk);
+                targetAcc.deductFromBalance(amt);
+                transactionsList.add(newTransactions);
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Transaction added. Transaction ID: " + newTransactions.getTransactionID());
 
-            transactionAccountComboBox.setValue(null);
-            dateComboBox.setValue(null);
-            transactionTypeComboBox.setValue(null);
-            transactionAccountComboBox.setValue(null);
-            tfTransactionAmount.clear();
-            tfTransactionRemarks.clear();
+                transactionAccountComboBox.setValue(null);
+                dateComboBox.setValue(null);
+                transactionTypeComboBox.setValue(null);
+                transactionAccountComboBox.setValue(null);
+                tfTransactionAmount.clear();
+                tfTransactionRemarks.clear();
 
-            primaryStage.setTitle("Main Menu");
-            primaryStage.setScene(menuScene);
+                primaryStage.setTitle("Main Menu");
+                primaryStage.setScene(menuScene);
 
-        }catch (NumberFormatException ex) {
+            }catch (NumberFormatException ex) {
 
                 showAlert(Alert.AlertType.ERROR, "Error", "Please enter a valid number for transaction balance.");
             }
@@ -415,6 +425,7 @@ public class MainMenu extends Application {
         Button btShowChart = new Button("showChart");
         btShowChart.setOnAction(e -> {
             primaryStage.setTitle("ShowChart");
+            Scene chartScene = chartScene(primaryStage, menuScene);
             primaryStage.setScene(chartScene);
         });
 
@@ -448,18 +459,98 @@ public class MainMenu extends Application {
         return null;
     }
     private Scene chartScene(Stage primaryStage , Scene displayTransactionScene) {
-        primaryStage.setTitle("Display Chart");
-        // Root layout for the scene
-        BorderPane chartMainPane = new BorderPane();
-        // Show Chart
+        primaryStage.setTitle("Transaction Charts");
 
-        //Back button to list
+        BorderPane root = new BorderPane();
+
+        // Create Pie Chart for spending by transaction type
+        PieChart pieChart = new PieChart();
+        pieChart.setTitle("Spending by Transaction Type");
+
+        // Aggregate spending by transaction type
+        Map<String, Double> typeSpending = new HashMap<>();
+        for (Transactions transaction : transactionsList) {
+            String type = transaction.getTransactionType();
+            double amount = transaction.getAmount();
+            typeSpending.merge(type, amount, Double::sum);
+        }
+
+        // Populate Pie Chart
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+        typeSpending.forEach((type, amount) ->
+                pieChartData.add(new PieChart.Data(type + ": " + String.format("%.2f", amount), amount))
+        );
+        pieChart.setData(pieChartData);
+
+        // Create Bar Chart for weekly spending
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        xAxis.setLabel("Week");
+        yAxis.setLabel("Spending Amount");
+
+        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+        barChart.setTitle("Weekly Spending");
+
+        // Find date range
+        LocalDate minDate = transactionsList.stream()
+                .map(Transactions::getTransactionDate)
+                .min(LocalDate::compareTo)
+                .orElse(LocalDate.now());
+        LocalDate maxDate = transactionsList.stream()
+                .map(Transactions::getTransactionDate)
+                .max(LocalDate::compareTo)
+                .orElse(LocalDate.now());
+
+        // Group transactions by week
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Spending");
+
+        long totalDays = ChronoUnit.DAYS.between(minDate, maxDate) + 1;
+        int weeks = (int) Math.ceil(totalDays / 7.0);
+
+        for (int i = 0; i < weeks; i++) {
+            LocalDate weekStart = minDate.plusDays(i * 7);
+            LocalDate weekEnd = weekStart.plusDays(6);
+            double weeklyTotal = transactionsList.stream()
+                    .filter(t -> !t.getTransactionDate().isBefore(weekStart) && !t.getTransactionDate().isAfter(weekEnd))
+                    .mapToDouble(Transactions::getAmount)
+                    .sum();
+            String weekLabel = weekStart + " to " + (weekEnd.isAfter(maxDate) ? maxDate : weekEnd);
+            series.getData().add(new XYChart.Data<>(weekLabel, weeklyTotal));
+        }
+
+        barChart.getData().add(series);
+
+        // Layout charts
+        VBox chartsBox = new VBox(20, pieChart, barChart);
+        chartsBox.setAlignment(Pos.CENTER);
+        root.setCenter(chartsBox);
+
+        // Back button
         Button btBackToMenu = new Button("Back");
         btBackToMenu.setOnAction(e -> {
-            primaryStage.setTitle("Transaction List");
-            primaryStage.setScene(displayTransactionScene);
+            primaryStage.setTitle("Display Transactions");
+            primaryStage.setScene(displayTransactionScene(primaryStage, displayTransactionScene));
         });
-        return new Scene(chartMainPane, 500, 300);
-    };
+
+        HBox buttonBox = new HBox(btBackToMenu);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.setPadding(new javafx.geometry.Insets(10));
+        root.setBottom(buttonBox);
+
+        return new Scene(root, 800, 600);
+    }
+
+
+    private static Accounts findAccountByID(Integer accountID) {
+        if (accountID == null) return null;
+        for (Accounts account : accountsList) {
+            if (account.getAccountID() == accountID) {
+                return account;
+            }
+        }
+        return null;
+    }
+};
 
 }
