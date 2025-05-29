@@ -13,6 +13,7 @@ public class Transactions {
     private double amount;
     private String remarks;
     private static ArrayList<String> transactionTypes = new ArrayList<>(); //ArrayList to store Transaction Types
+    private static ArrayList<Transactions> transactionsList = new ArrayList<>(); // ArrayList to store transaction
 
 
     // Constructor for creating a transaction
@@ -24,6 +25,8 @@ public class Transactions {
         this.account = account;
         this.amount = amount;
         this.remarks = remarks;
+        transactionsList.add(this);
+
     }
     // Add a new transaction type
     public static boolean addTransactionType(String type) {
@@ -64,23 +67,26 @@ public class Transactions {
 
     //Getters
 
-    public static int getIDCounter(){
+    public static int getIdCounter(){
         return idCounter;
     }
 
-    public int getTransID(){
+    public int getTransactionID(){
+
         return transactionID;
     }
 
-    public LocalDate getTransDate(){
+    public String getTransCurrencyType() {return transCurrencyType;}
+
+    public LocalDate getTransactionDate(){
         return transactionDate;
     }
 
-    public String getTransType(){
+    public String getTransactionType(){
         return transactionType;
     }
 
-    public Accounts getTransAccounts(){
+    public Accounts getAccount(){
         return account;
     }
 
@@ -93,6 +99,8 @@ public class Transactions {
     }
 
     public static ArrayList<String> getTransactionTypes() {return transactionTypes; }
+
+    public static ArrayList<Transactions> getTransactionList(){return transactionsList;}
 
 
     // Display transaction details
