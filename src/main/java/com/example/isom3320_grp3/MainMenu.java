@@ -404,26 +404,37 @@ public class MainMenu extends Application {
         // Create columns
         TableColumn<Transactions, Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        idColumn.setSortable(true);
 
         TableColumn<Transactions, LocalDate> dateColumn = new TableColumn<>("Date");
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        dateColumn.setSortable(true);
 
         TableColumn<Transactions, String> typeColumn = new TableColumn<>("Type");
-        typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        typeColumn.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
+        typeColumn.setSortable(true);
 
         TableColumn<Transactions, String> accountColumn = new TableColumn<>("Account");
         accountColumn.setCellValueFactory(new PropertyValueFactory<>("account"));
+        accountColumn.setSortable(true);
 
         TableColumn<Transactions, Double> amountColumn = new TableColumn<>("Amount");
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        amountColumn.setSortable(true);
 
         TableColumn<Transactions, String> remarksColumn = new TableColumn<>("Remarks");
         remarksColumn.setCellValueFactory(new PropertyValueFactory<>("remarks"));
+        remarksColumn.setSortable(true);
 
         // Add columns to the table
         tableView.getColumns().addAll(idColumn, dateColumn, typeColumn, accountColumn, amountColumn, remarksColumn);
-        //updateTableView(tableView,transactionsList);
+        //add history
+        tableView.getItems().clear();
+        for (Transactions item : transactionsList){
+            tableView.getItems().add(item);
+        }
         displayMenu.setCenter(tableView);
+
         //Back button
         Button btBackToMenu = new Button("Back");
 
