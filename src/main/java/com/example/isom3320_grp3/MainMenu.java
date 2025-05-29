@@ -7,16 +7,14 @@ import java.util.ArrayList;
 import javafx.application.Application;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
-import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -368,104 +366,6 @@ public class MainMenu extends Application {
 
 
     //Display Transaction
-    private Scene createDisplayScene(Stage primaryStage , Scene menuScene) {
-        primaryStage.setTitle("Display Transactions");
-        BorderPane displayMenu = new BorderPane();
-
-        //Sort By combo box
-        VBox sortByBox = new VBox();
-        sortByBox.setAlignment(Pos.TOP_CENTER);
-
-        HBox sortByHBox = new HBox();
-        Label lblSortBy = new Label("Sort By:");
-        ComboBox<String> sortByComboBox = new ComboBox<>();
-        sortByComboBox.setPromptText("Sort By");
-        sortByComboBox.getItems().addAll();
-        sortByHBox.getChildren().addAll(lblSortBy, sortByComboBox);
-        sortByBox.getChildren().add(sortByHBox);
-
-        displayMenu.setTop(sortByBox);
-        //Six columns
-        /*
-        GridPane gridPane = new GridPane();
-        gridPane.setHgap(10);
-        gridPane.setVgap(10);
-
-        String[] columnNames = {"ID", "Date", "Type","Account", "Amount", "Remarks"};
-        for (int i = 0; i < 6 ; i++){
-            Label label = new Label(columnNames[i]);
-            gridPane.add(label , i , 0);
-            if (i < 6) {
-                Separator separator = new Separator();
-                separator.setOrientation(javafx.geometry.Orientation.VERTICAL);
-                gridPane.add(separator, i, 0, 1, 2); // Span the separator across two rows
-
-                GridPane.setHalignment(label, HPos.CENTER);
-            }
-        }
-        gridPane.setPrefWidth(300);
-        for (int i = 0; i < 6; i++) {
-            gridPane.getColumnConstraints().add(new javafx.scene.layout.ColumnConstraints(50)); // Set each column width
-        }
-        displayMenu.setCenter(gridPane);*/
-        TableView<Transactions> tableView = new TableView<>();
-
-        // Create columns
-        TableColumn<Transactions, Integer> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-
-        TableColumn<Transactions, LocalDate> dateColumn = new TableColumn<>("Date");
-        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
-
-        TableColumn<Transactions, String> typeColumn = new TableColumn<>("Type");
-        typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
-
-        TableColumn<Transactions, String> accountColumn = new TableColumn<>("Account");
-        accountColumn.setCellValueFactory(new PropertyValueFactory<>("account"));
-
-        TableColumn<Transactions, Double> amountColumn = new TableColumn<>("Amount");
-        amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
-
-        TableColumn<Transactions, String> remarksColumn = new TableColumn<>("Remarks");
-        remarksColumn.setCellValueFactory(new PropertyValueFactory<>("remarks"));
-
-        // Add columns to the table
-        tableView.getColumns().addAll(idColumn, dateColumn, typeColumn, accountColumn, amountColumn, remarksColumn);
-        //updateTableView(tableView,transactionsList);
-        displayMenu.setCenter(tableView);
-        //Back button
-        Button btBackToMenu = new Button("Back");
-
-        btBackToMenu.setOnAction(e ->{
-            primaryStage.setTitle("Main Menu");
-            primaryStage.setScene(menuScene);
-        });
-
-        HBox backBox = new HBox(btBackToMenu);
-        backBox.setAlignment(Pos.BASELINE_LEFT);
-        displayMenu.setBottom(backBox);
-
-        return new Scene(displayMenu, 500 , 300 );
-    }
-
-    // Helper method to show alerts
-    private void showAlert(Alert.AlertType alertType, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    private static Accounts findAccountByID(int accountID) {
-
-        for (Accounts account : accountsList) {
-            if (account.getAccountID() == accountID) {
-                return account;
-            }
-        }
-        return null;
-    }
     private Scene displayTransactionScene(Stage primaryStage, Scene menuScene) {
         primaryStage.setTitle("Display Transactions");
 
@@ -519,6 +419,26 @@ public class MainMenu extends Application {
         BorderPane.setMargin(btBackToMenu, new javafx.geometry.Insets(10));
 
         // Create and return the scene
-        return new Scene(root, 800, 600);
+        return new Scene(root, 500, 300);
     }
+
+    // Helper method to show alerts
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private static Accounts findAccountByID(int accountID) {
+
+        for (Accounts account : accountsList) {
+            if (account.getAccountID() == accountID) {
+                return account;
+            }
+        }
+        return null;
+    }
+
 }
