@@ -5,10 +5,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
+import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -48,12 +51,15 @@ public class MainMenu extends Application {
                 showAlert(Alert.AlertType.ERROR, "Error", "No Account Created.");
             } else if (Transactions.getTransactionTypes().isEmpty()){
                 showAlert(Alert.AlertType.ERROR, "Error", "No Transaction Types Created.");
-            } else {            
-            Scene transactionScene = createTransactionScene(primaryStage, primaryScene);
-            primaryStage.setScene(transactionScene);
+            } else {
+                Scene transactionScene = createTransactionScene(primaryStage, primaryScene);
+                primaryStage.setScene(transactionScene);
             }
         });
-        btDisplayTransaction.setOnAction(e -> {System.out.println("Display Transaction");});
+        btDisplayTransaction.setOnAction(e -> {
+            Scene displayTransactionScene = createDisplayScene(primaryStage, primaryScene);
+            primaryStage.setScene(displayTransactionScene);
+        });
 
         //Add to VBox
         vbox.getChildren().addAll(btCreateAccount, btCreateType, btCreateTransaction, btDisplayTransaction);
@@ -122,7 +128,7 @@ public class MainMenu extends Application {
                 }
 
                 // Create new account
-                Accounts newAccount = new Accounts(accountName,currencyType, initialBalance);
+                Accounts newAccount = new Accounts(accountName, currencyType, initialBalance);
                 accountsList.add(newAccount);
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Account created successfully: ID " + newAccount.getAccountID()+ ", Name: " + newAccount.getAccountName());
 
@@ -204,13 +210,13 @@ public class MainMenu extends Application {
             String transactionType = tftype.getText().trim();
 
             // Validate input
-        if (Transactions.addTransactionType(transactionType)) {
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Transaction type added: " + transactionType);
-            tftype.clear();
-            System.out.println(Transactions.getTransactionTypes());
-        } else {
-            showAlert(Alert.AlertType.ERROR, "Error", "Invalid or duplicate transaction type.");
-        }
+            if (Transactions.addTransactionType(transactionType)) {
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Transaction type added: " + transactionType);
+                tftype.clear();
+                System.out.println(Transactions.getTransactionTypes());
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "Invalid or duplicate transaction type.");
+            }
         });
 
         // Create and return the scene
@@ -218,14 +224,6 @@ public class MainMenu extends Application {
         return typeScene;
     }
 
-        // Helper method to show alerts
-        private void showAlert(Alert.AlertType alertType, String title, String message) {
-            Alert alert = new Alert(alertType);
-            alert.setTitle(title);
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
-        }
     //Create Transaction
     private Scene createTransactionScene(Stage primaryStage , Scene menuScene) {
         primaryStage.setTitle("Create Transaction");
@@ -256,6 +254,7 @@ public class MainMenu extends Application {
         Label lblTransactionAccount = new Label("Account ID");
         ComboBox<Integer> transactionAccountComboBox = new ComboBox<>();
         Label lblTransactionCurrency = new Label(null);
+
         Label lblAccountName = new Label(null);
         for (int i = 0; i < accountsList.size(); i++){
             transactionAccountComboBox.getItems().add(accountsList.get(i).getAccountID());
@@ -265,6 +264,7 @@ public class MainMenu extends Application {
             Accounts tempAcc = findAccountByID(transactionAccountComboBox.getValue());
             lblTransactionCurrency.setText(tempAcc.getCurrencyType());
             lblAccountName.setText(tempAcc.getAccountName());
+
         });
 
         //Type
@@ -305,6 +305,7 @@ public class MainMenu extends Application {
         });
         btCreateTransaction.setOnAction(e -> {
             try{
+
             String transCurrency = lblTransactionCurrency.getText();
             LocalDate transDate = LocalDate.parse(dateComboBox.getValue());
             String transType = transactionTypeComboBox.getValue();
@@ -340,6 +341,7 @@ public class MainMenu extends Application {
             primaryStage.setScene(menuScene);
 
         }catch (NumberFormatException ex) {
+
                 showAlert(Alert.AlertType.ERROR, "Error", "Please enter a valid number for transaction balance.");
             }
 
@@ -355,7 +357,99 @@ public class MainMenu extends Application {
         return new Scene(transactionMenu , 500 , 300);
     }
 
-        private static Accounts findAccountByID(int accountID) {
+
+    //Display Transaction
+    private Scene createDisplayScene(Stage primaryStage , Scene menuScene) {
+        primaryStage.setTitle("Display Transactions");
+        BorderPane displayMenu = new BorderPane();
+
+        //Sort By combo box
+        VBox sortByBox = new VBox();
+        sortByBox.setAlignment(Pos.TOP_CENTER);
+
+        HBox sortByHBox = new HBox();
+        Label lblSortBy = new Label("Sort By:");
+        ComboBox<String> sortByComboBox = new ComboBox<>();
+        sortByComboBox.setPromptText("Sort By");
+        sortByComboBox.getItems().addAll();
+        sortByHBox.getChildren().addAll(lblSortBy, sortByComboBox);
+        sortByBox.getChildren().add(sortByHBox);
+
+        displayMenu.setTop(sortByBox);
+        //Six columns
+        /*
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+
+        String[] columnNames = {"ID", "Date", "Type","Account", "Amount", "Remarks"};
+        for (int i = 0; i < 6 ; i++){
+            Label label = new Label(columnNames[i]);
+            gridPane.add(label , i , 0);
+            if (i < 6) {
+                Separator separator = new Separator();
+                separator.setOrientation(javafx.geometry.Orientation.VERTICAL);
+                gridPane.add(separator, i, 0, 1, 2); // Span the separator across two rows
+
+                GridPane.setHalignment(label, HPos.CENTER);
+            }
+        }
+        gridPane.setPrefWidth(300);
+        for (int i = 0; i < 6; i++) {
+            gridPane.getColumnConstraints().add(new javafx.scene.layout.ColumnConstraints(50)); // Set each column width
+        }
+        displayMenu.setCenter(gridPane);*/
+        TableView<Transactions> tableView = new TableView<>();
+
+        // Create columns
+        TableColumn<Transactions, Integer> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+
+        TableColumn<Transactions, LocalDate> dateColumn = new TableColumn<>("Date");
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+
+        TableColumn<Transactions, String> typeColumn = new TableColumn<>("Type");
+        typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+
+        TableColumn<Transactions, String> accountColumn = new TableColumn<>("Account");
+        accountColumn.setCellValueFactory(new PropertyValueFactory<>("account"));
+
+        TableColumn<Transactions, Double> amountColumn = new TableColumn<>("Amount");
+        amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+
+        TableColumn<Transactions, String> remarksColumn = new TableColumn<>("Remarks");
+        remarksColumn.setCellValueFactory(new PropertyValueFactory<>("remarks"));
+
+        // Add columns to the table
+        tableView.getColumns().addAll(idColumn, dateColumn, typeColumn, accountColumn, amountColumn, remarksColumn);
+        //updateTableView(tableView,transactionsList);
+        displayMenu.setCenter(tableView);
+        //Back button
+        Button btBackToMenu = new Button("Back");
+
+        btBackToMenu.setOnAction(e ->{
+            primaryStage.setTitle("Main Menu");
+            primaryStage.setScene(menuScene);
+        });
+
+        HBox backBox = new HBox(btBackToMenu);
+        backBox.setAlignment(Pos.BASELINE_LEFT);
+        displayMenu.setBottom(backBox);
+
+        return new Scene(displayMenu, 500 , 300 );
+    }
+
+    // Helper method to show alerts
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private static Accounts findAccountByID(int accountID) {
+
         for (Accounts account : accountsList) {
             if (account.getAccountID() == accountID) {
                 return account;

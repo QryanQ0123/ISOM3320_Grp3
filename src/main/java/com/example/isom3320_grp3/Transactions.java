@@ -67,7 +67,7 @@ public class Transactions {
     public static int getIDCounter(){
         return idCounter;
     }
-    
+
     public int getTransID(){
         return transactionID;
     }
