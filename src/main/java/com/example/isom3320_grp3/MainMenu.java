@@ -552,5 +552,3 @@ public class MainMenu extends Application {
         return null;
     }
 };
-
-}
