@@ -23,10 +23,8 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import java.time.temporal.ChronoUnit; // For ChronoUnit
 import java.util.HashMap; // For HashMap
 import java.util.Map; // For Map interface
-import javafx.collections.FXCollections; // For FXCollections
 import javafx.collections.ObservableList; // For ObservableList
 
 public class MainMenu extends Application {
