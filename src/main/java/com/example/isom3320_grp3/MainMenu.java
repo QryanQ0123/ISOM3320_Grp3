@@ -23,10 +23,8 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import java.time.temporal.ChronoUnit; // For ChronoUnit
 import java.util.HashMap; // For HashMap
 import java.util.Map; // For Map interface
-import javafx.collections.FXCollections; // For FXCollections
 import javafx.collections.ObservableList; // For ObservableList
 
 public class MainMenu extends Application {
@@ -463,70 +461,70 @@ public class MainMenu extends Application {
 
         BorderPane root = new BorderPane();
 
-        // Create Pie Chart for spending by transaction type
-        PieChart pieChart = new PieChart();
-        pieChart.setTitle("Spending by Transaction Type");
+        // Define exchange rates to USD
+        Map<String, Double> exchangeRates = new HashMap<>();
+        exchangeRates.put("HKD", 0.128);
+        exchangeRates.put("EUR", 1.09);
+        exchangeRates.put("USD", 1.0);
 
-        // Aggregate spending by transaction type
+        // Create Pie Chart for spending by transaction type (in USD)
+        PieChart pieChart = new PieChart();
+        pieChart.setTitle("Spending by Transaction Type (USD)");
+
+        // Aggregate spending by transaction type in USD
         Map<String, Double> typeSpending = new HashMap<>();
         for (Transactions transaction : transactionsList) {
             String type = transaction.getTransactionType();
             double amount = transaction.getAmount();
-            typeSpending.merge(type, amount, Double::sum);
+            String currency = transaction.getTransCurrencyType();
+            double amountInUSD = amount * exchangeRates.getOrDefault(currency, 1.0);
+            typeSpending.merge(type, amountInUSD, Double::sum);
         }
 
         // Populate Pie Chart
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
         typeSpending.forEach((type, amount) ->
-                pieChartData.add(new PieChart.Data(type + ": " + String.format("%.2f", amount), amount))
+                pieChartData.add(new PieChart.Data(type + ": " + String.format("%.2f USD", amount), amount))
         );
         pieChart.setData(pieChartData);
 
-        // Create Bar Chart for weekly spending
+        // Create Bar Chart for proportion of spending by account (in USD)
         CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("Week");
-        yAxis.setLabel("Spending Amount");
+        NumberAxis yAxis = new NumberAxis(0, 100, 10);
+        xAxis.setLabel("Account");
+        yAxis.setLabel("Proportion of Total Spending (%)");
 
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
-        barChart.setTitle("Weekly Spending");
+        barChart.setTitle("Spending Proportion by Account (USD)");
 
-        // Find date range
-        LocalDate minDate = transactionsList.stream()
-                .map(Transactions::getTransactionDate)
-                .min(LocalDate::compareTo)
-                .orElse(LocalDate.now());
-        LocalDate maxDate = transactionsList.stream()
-                .map(Transactions::getTransactionDate)
-                .max(LocalDate::compareTo)
-                .orElse(LocalDate.now());
-
-        // Group transactions by week
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Spending");
-
-        long totalDays = ChronoUnit.DAYS.between(minDate, maxDate) + 1;
-        int weeks = (int) Math.ceil(totalDays / 7.0);
-
-        for (int i = 0; i < weeks; i++) {
-            LocalDate weekStart = minDate.plusDays(i * 7);
-            LocalDate weekEnd = weekStart.plusDays(6);
-            double weeklyTotal = transactionsList.stream()
-                    .filter(t -> !t.getTransactionDate().isBefore(weekStart) && !t.getTransactionDate().isAfter(weekEnd))
-                    .mapToDouble(Transactions::getAmount)
-                    .sum();
-            String weekLabel = weekStart + " to " + (weekEnd.isAfter(maxDate) ? maxDate : weekEnd);
-            series.getData().add(new XYChart.Data<>(weekLabel, weeklyTotal));
+        // Aggregate spending by account in USD
+        Map<Accounts, Double> accountSpending = new HashMap<>();
+        double totalSpendingUSD = 0.0;
+        for (Transactions transaction : transactionsList) {
+            Accounts account = transaction.getAccount();
+            double amount = transaction.getAmount();
+            String currency = transaction.getTransCurrencyType();
+            double amountInUSD = amount * exchangeRates.getOrDefault(currency, 1.0);
+            accountSpending.merge(account, amountInUSD, Double::sum);
+            totalSpendingUSD += amountInUSD;
         }
+
+        // Create bar chart data
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Proportion");
+        final double finalTotalSpending = totalSpendingUSD > 0 ? totalSpendingUSD : 1.0; // Avoid division by zero
+        accountSpending.forEach((account, amount) -> {
+            double proportion = (amount / finalTotalSpending) * 100;
+            String label = "ID: " + account.getAccountID() + " (" + account.getAccountName() + ")";
+            series.getData().add(new XYChart.Data<>(label, proportion));
+        });
 
         barChart.getData().add(series);
 
-        // Layout charts
         VBox chartsBox = new VBox(20, pieChart, barChart);
         chartsBox.setAlignment(Pos.CENTER);
         root.setCenter(chartsBox);
 
-        // Back button
         Button btBackToMenu = new Button("Back");
         btBackToMenu.setOnAction(e -> {
             primaryStage.setTitle("Display Transactions");
@@ -541,13 +539,10 @@ public class MainMenu extends Application {
         return new Scene(root, 800, 600);
     }
 
-
     private static Accounts findAccountByID(Integer accountID) {
         if (accountID == null) return null;
         for (Accounts account : accountsList) {
-            if (account.getAccountID() == accountID) {
-                return account;
-            }
+            if (account.getAccountID() == accountID) return account;
         }
         return null;
     }
